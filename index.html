@@ -1,519 +1,264 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ميزان اليمن القضائي | المنصة الاحترافية</title>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
-
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@300;500;700&display=swap');
-  
-  :root {
-    --gold: #d4af37;
-    --dark-bg: #080c14;
-    --surface: #121926;
-    --border: #1e293b;
-  }
-
-  body {
-    font-family: 'Noto Sans Arabic', sans-serif;
-    background-color: var(--dark-bg);
-    color: #f1f5f9;
-  }
-
-  .glass-panel {
-    background: rgba(18, 25, 38, 0.9);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--border);
-  }
-
-  .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-  .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-
-  .law-btn {
-    transition: all 0.2s ease;
-    border: 1px solid transparent;
-  }
-  .law-btn:hover {
-    border-color: var(--gold);
-    background: rgba(212, 175, 55, 0.05);
-  }
-  
-  .active-mode {
-    border-color: var(--gold) !important;
-    background: rgba(212, 175, 55, 0.1) !important;
-  }
-
-  .typing-dot {
-    width: 4px;
-    height: 4px;
-    background: var(--gold);
-    border-radius: 50%;
-    animation: typing 1.4s infinite mb-1;
-  }
-  @keyframes typing {
-    0%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-6px); }
-  }
-</style>
-</head>
-<body class="h-screen flex flex-col overflow-hidden">
-
-<div id="loginOverlay" class="fixed inset-0 z-[9999] bg-[#05080f] flex items-center justify-center p-4">
-  <div class="glass-panel w-full max-w-md p-10 rounded-3xl shadow-2xl text-center border-b-4 border-[#d4af37]">
-    <div class="text-6xl mb-6">⚖️</div>
-    <h2 class="text-3xl font-bold text-[#d4af37] mb-2">ميزان اليمن</h2>
-    <p class="text-slate-500 text-sm mb-8">بوابة العدالة والتحليل القانوني الذكي</p>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ميزان اليمن القضائي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <div class="space-y-4">
-      <input type="text" id="loginUsername" placeholder="اسم المستخدم" class="w-full bg-[#080c14] border border-[#1e293b] p-4 rounded-xl text-center focus:border-[#d4af37] outline-none">
-      <input type="password" id="loginPassword" placeholder="كلمة المرور" class="w-full bg-[#080c14] border border-[#1e293b] p-4 rounded-xl text-center focus:border-[#d4af37] outline-none">
-      <button onclick="window.handleLogin()" id="loginBtn" class="w-full bg-[#d4af37] text-black font-extrabold py-4 rounded-xl hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-30" disabled>دخول النظام</button>
-      <p id="authStatus" class="text-[10px] text-slate-600 mt-4 animate-pulse">جاري تأمين الاتصال السحابي...</p>
-    </div>
-  </div>
-</div>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#080c14',
+                        darker: '#05080f',
+                        panel: '#121826',
+                        gold: '#d4af37',
+                        goldHover: '#b5952f'
+                    },
+                    fontFamily: {
+                        sans: ['Tajawal', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #05080f; color: #ffffff; overflow-x: hidden; }
+        .gold-gradient { background: linear-gradient(135deg, #d4af37 0%, #b5952f 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .border-gold { border-color: #d4af37; }
+        .bg-gold-btn { background-color: #d4af37; color: #080c14; transition: all 0.3s ease; }
+        .bg-gold-btn:hover { background-color: #b5952f; }
+        
+        /* تصميم سكرول بار أنيق */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #080c14; }
+        ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
+        
+        /* حركات القائمة الجانبية */
+        .sidebar-open { transform: translateX(0); }
+        .sidebar-closed { transform: translateX(100%); }
+        .overlay-open { display: block; opacity: 1; }
+        .overlay-closed { display: none; opacity: 0; }
+    </style>
+</head>
+<body class="font-sans antialiased h-screen flex flex-col relative">
 
-<header class="h-16 border-b border-[#1e293b] bg-[#0a0f18] px-6 flex items-center justify-between z-50">
-  <div class="flex items-center gap-4">
-    <div class="text-2xl">⚖️</div>
-    <div>
-      <h1 class="text-sm font-bold tracking-tight">ميزان اليمن القضائي</h1>
-      <div class="flex items-center gap-2">
-        <span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>
-        <span class="text-[9px] text-slate-500 uppercase font-bold">النظام متصل سحابياً</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="flex items-center gap-4">
-    <div id="adminTools" class="hidden flex items-center gap-2 border-l border-[#1e293b] pl-4">
-      <button onclick="window.showModal('settingsModal')" class="p-2 hover:bg-[#1e293b] rounded-lg" title="إعدادات المفتاح">🔑</button>
-    </div>
-    <div class="flex items-center gap-3">
-      <div class="text-left hidden md:block">
-        <p id="userNameDisplay" class="text-xs font-bold text-[#d4af37]"></p>
-        <p id="userRoleDisplay" class="text-[9px] text-slate-500 text-right"></p>
-      </div>
-      <button onclick="window.logout()" class="w-8 h-8 flex items-center justify-center bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all">🚪</button>
-    </div>
-  </div>
-</header>
-
-<main class="flex flex-1 overflow-hidden">
-  <aside class="w-80 border-l border-[#1e293b] bg-[#05080f] flex flex-col shrink-0">
-    <div class="p-4 space-y-4 flex-1 overflow-y-auto custom-scrollbar">
-      <div class="space-y-2">
-        <h3 class="text-[10px] font-bold text-slate-500 uppercase px-2">أدوات التحليل</h3>
-        <button id="mode-analyze_judgment" onclick="window.setMode('analyze_judgment')" class="w-full law-btn flex items-center gap-3 p-3 rounded-xl bg-[#121926] text-xs">
-          <span>🏛️</span> تحليل منطوق الحكم
-        </button>
-        <button id="mode-legal_draft" onclick="window.setMode('legal_draft')" class="w-full law-btn flex items-center gap-3 p-3 rounded-xl bg-[#121926] text-xs">
-          <span>📝</span> صياغة مسودة قانونية
-        </button>
-        <button id="mode-evidence_check" onclick="window.setMode('evidence_check')" class="w-full law-btn flex items-center gap-3 p-3 rounded-xl bg-[#121926] text-xs">
-          <span>🔍</span> فحص الأدلة والقرائن
-        </button>
-        <button id="mode-consult" onclick="window.setMode('consult')" class="w-full law-btn flex items-center gap-3 p-3 rounded-xl bg-[#121926] text-xs active-mode">
-          <span>💬</span> استشارة قانونية عامة
-        </button>
-      </div>
-
-      <div class="pt-4 border-t border-[#1e293b]">
-        <div class="flex border-b border-[#1e293b] mb-4">
-          <button id="btn-lib" onclick="window.switchSideTab('lib')" class="flex-1 pb-2 text-[11px] font-bold border-b-2 border-[#d4af37] text-[#d4af37]">المكتبة العامة</button>
-          <button id="btn-pers" onclick="window.switchSideTab('pers')" class="flex-1 pb-2 text-[11px] font-bold text-slate-500">ملفات القضية</button>
+    <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-darker relative">
+        <div class="bg-panel border border-gray-800 rounded-2xl p-8 w-11/12 max-w-md shadow-2xl text-center shadow-gold/10 relative overflow-hidden z-10">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gold"></div>
+            <i class="fas fa-balance-scale text-5xl text-gold mb-4"></i>
+            <h1 class="text-3xl font-bold mb-2 gold-gradient">ميزان اليمن</h1>
+            <p class="text-gray-400 text-sm mb-8">بوابة العدالة والتحليل القانوني الذكي</p>
+            
+            <input type="text" id="username" placeholder="اسم المستخدم (admin)" class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-3 mb-4 text-white focus:outline-none focus:border-gold transition text-center" value="admin">
+            <input type="password" id="password" placeholder="كلمة المرور" class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-3 mb-6 text-white focus:outline-none focus:border-gold transition text-center" value="123456">
+            
+            <button onclick="login()" id="loginBtn" class="w-full bg-gold-btn font-bold rounded-lg px-4 py-3 shadow-lg shadow-gold/20 flex justify-center items-center gap-2">
+                <span>دخول النظام</span>
+                <i class="fas fa-sign-in-alt"></i>
+            </button>
+            <p id="loginStatus" class="mt-4 text-sm text-gray-500">جاري تأمين الاتصال...</p>
         </div>
-        <div id="side-lib" class="space-y-2">
-          <div class="flex justify-between items-center mb-2">
-            <span class="text-[10px] text-slate-500">نصوص القوانين</span>
-            <button onclick="document.getElementById('file-lib').click()" class="admin-only hidden text-[#d4af37] text-[18px]">+</button>
-            <input type="file" id="file-lib" class="hidden" onchange="window.uploadToCloud(event, 'library')">
-          </div>
-          <div id="list-lib" class="space-y-1"></div>
+
+        <div class="absolute bottom-4 left-0 w-full text-center text-xs leading-relaxed z-0 pb-2">
+            <p class="text-gray-500 mb-1">جميع الحقوق محفوظة &copy; 2026</p>
+            <p class="text-gray-400"><span class="text-gold font-bold">فكرة وإعداد وإشراف /</span> م. خالد العزي</p>
+            <div class="flex items-center justify-center gap-2 mt-1 text-gray-400">
+                <span class="text-gold font-bold">برمجة وتطوير:</span>
+                <span>م. خالد العزي 771893845</span>
+                <span class="text-gray-600">|</span>
+                <span>م. وسام محي الدين 770744040</span>
+            </div>
         </div>
-        <div id="side-pers" class="hidden space-y-2">
-          <div class="flex justify-between items-center mb-2">
-            <span class="text-[10px] text-slate-500">مستنداتك المرفوعة</span>
-            <button onclick="document.getElementById('file-pers').click()" class="text-blue-500 text-[18px]">+</button>
-            <input type="file" id="file-pers" class="hidden" onchange="window.uploadToCloud(event, 'personal')">
-          </div>
-          <div id="list-pers" class="space-y-1"></div>
-        </div>
-      </div>
     </div>
 
-    <div id="activeBox" class="p-4 bg-[#0a0f18] border-t border-[#1e293b] hidden">
-      <div class="bg-[#d4af37]/5 border border-[#d4af37]/20 p-3 rounded-xl relative">
-        <button onclick="window.clearActive()" class="absolute top-2 left-2 text-slate-500 text-xs">✕</button>
-        <p class="text-[10px] text-[#d4af37] font-bold mb-1">المرجع النشط حالياً:</p>
-        <p id="activeName" class="text-[11px] truncate text-slate-300 font-bold"></p>
-      </div>
-    </div>
-  </aside>
+    <div id="mainApp" class="hidden h-full flex flex-col relative">
+        
+        <header class="bg-panel border-b border-gray-800 p-4 flex justify-between items-center z-30 shadow-md">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebar()" class="text-gold text-2xl p-1 focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-balance-scale text-gold text-xl"></i>
+                    <h1 class="text-lg font-bold text-white hidden sm:block">ميزان اليمن القضائي</h1>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-sm text-gray-300 bg-dark px-3 py-1 rounded-full border border-gray-700"><i class="fas fa-user-tie text-gold ml-1"></i> مدير النظام</span>
+            </div>
+        </header>
 
-  <section class="flex-1 flex flex-col bg-[#080c14] relative">
-    <div id="chatBox" class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
-      <div class="max-w-4xl mx-auto flex flex-col gap-6">
-        <div class="flex gap-4 items-start">
-          <div class="w-10 h-10 rounded-xl bg-[#d4af37]/10 border border-[#d4af37]/30 flex items-center justify-center shrink-0">⚖️</div>
-          <div class="bg-[#121926] p-5 rounded-2xl border border-[#1e293b] shadow-lg max-w-2xl">
-            <h4 class="text-sm font-bold text-[#d4af37] mb-2">مرحباً بك في ميزان اليمن</h4>
-            <p class="text-xs text-slate-300 leading-relaxed">
-              تم تصحيح مشكلة الموديل. النظام يعمل الآن باستخدام النسخة المستقرة المتاحة في هذه البيئة.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+        <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-40 transition-opacity duration-300 overlay-closed"></div>
 
-    <div class="p-6 bg-gradient-to-t from-[#080c14] via-[#080c14] to-transparent">
-      <div class="max-w-4xl mx-auto relative">
-        <div class="glass-panel rounded-2xl border border-[#1e293b] focus-within:border-[#d4af37] transition-all">
-          <textarea id="promptInput" rows="1" placeholder="اطلب تحليل القضية أو صياغة مسودة..." class="w-full bg-transparent p-4 text-sm outline-none resize-none custom-scrollbar min-h-[56px]" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); window.sendPrompt();}"></textarea>
-          
-          <div class="flex items-center justify-between px-4 pb-3">
-            <div class="flex gap-4 items-center">
-              <button onclick="document.getElementById('imgInp').click()" class="text-slate-500 hover:text-[#d4af37] transition-colors" title="إرفاق صورة">
-                <span class="text-xl">📷</span>
-              </button>
-              <button onclick="document.getElementById('file-pers').click()" class="text-slate-500 hover:text-[#d4af37] transition-colors" title="إرفاق مستند">
-                <span class="text-xl">📎</span>
-              </button>
-              <input type="file" id="imgInp" class="hidden" accept="image/*" onchange="window.handleImg(event)">
-              <span id="imgStatus" class="hidden text-[10px] bg-[#d4af37] text-black px-2 py-0.5 rounded font-bold flex items-center gap-1">
-                صورة مرفقة <button onclick="window.removeImg()" class="hover:text-red-700">✕</button>
-              </span>
+        <aside id="sidebar" class="fixed top-0 right-0 h-full w-72 bg-panel border-l border-gray-800 z-50 transition-transform duration-300 sidebar-closed flex flex-col shadow-2xl">
+            <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-darker">
+                <h2 class="font-bold text-gold text-lg"><i class="fas fa-compass ml-2"></i>القائمة الرئيسية</h2>
+                <button onclick="toggleSidebar()" class="text-gray-400 hover:text-white text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             
-            <div class="flex items-center gap-4">
-              <span id="modeTag" class="text-[10px] font-bold text-[#d4af37] bg-[#d4af37]/10 px-2 py-1 rounded border border-[#d4af37]/20 uppercase">وضع الاستشارة</span>
-              <button onclick="window.sendPrompt()" id="btnSend" class="bg-[#d4af37] text-black w-10 h-10 rounded-xl flex items-center justify-center hover:scale-105 transition-transform disabled:opacity-20 shadow-[0_0_15px_rgba(212,175,55,0.3)]">➤</button>
+            <div class="p-4 overflow-y-auto flex-1">
+                <div class="mb-6">
+                    <h3 class="text-xs text-gray-500 mb-3 uppercase tracking-wider">أدوات التحليل</h3>
+                    <ul class="space-y-2">
+                        <li><button class="w-full text-right p-3 rounded-lg bg-dark border border-gray-700 text-gold hover:bg-gray-800 transition"><i class="fas fa-file-contract ml-2 w-5"></i>تحليل العقود</button></li>
+                        <li><button class="w-full text-right p-3 rounded-lg hover:bg-dark text-gray-300 transition"><i class="fas fa-gavel ml-2 w-5"></i>السوابق القضائية</button></li>
+                    </ul>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-xs text-gray-500 mb-3 uppercase tracking-wider">إدارة المستخدمين</h3>
+                    <ul class="space-y-2">
+                        <li><button class="w-full text-right p-3 rounded-lg hover:bg-dark text-gray-300 transition"><i class="fas fa-users ml-2 w-5 text-blue-400"></i>قائمة الباحثين</button></li>
+                        <li><button class="w-full text-right p-3 rounded-lg hover:bg-dark text-gray-300 transition"><i class="fas fa-user-shield ml-2 w-5 text-green-400"></i>صلاحيات الوصول</button></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-xs text-gray-500 mb-3 uppercase tracking-wider">المستندات المحفوظة</h3>
+                    <ul class="space-y-2">
+                        <li><button class="w-full text-right p-3 rounded-lg hover:bg-dark text-gray-300 transition text-sm"><i class="fas fa-folder-open ml-2 text-gold"></i>مسودة حكم مدني - تعز</button></li>
+                        <li><button class="w-full text-right p-3 rounded-lg hover:bg-dark text-gray-300 transition text-sm"><i class="fas fa-folder-open ml-2 text-gold"></i>عقد شراكة تجارية</button></li>
+                    </ul>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
+
+            <div class="p-4 border-t border-gray-800 bg-darker text-xs text-gray-400 leading-relaxed text-right">
+                <p class="mb-2 text-center text-gray-500">الإصدار 1.0.0 &copy; 2026</p>
+                <div class="bg-dark p-3 rounded-lg border border-gray-800">
+                    <p class="mb-1"><span class="text-gold font-bold">فكرة وإعداد وإشراف /</span><br>م. خالد العزي</p>
+                    <div class="mt-2 pt-2 border-t border-gray-700">
+                        <p class="text-gold font-bold mb-1">برمجة وتطوير:</p>
+                        <p class="mb-1 flex justify-between"><span>م. خالد العزي</span> <span class="text-gray-500" dir="ltr">771893845</span></p>
+                        <p class="flex justify-between"><span>م. وسام محي الدين</span> <span class="text-gray-500" dir="ltr">770744040</span></p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-darker flex flex-col gap-4" id="chatArea">
+            <div class="flex items-start gap-3 w-full max-w-4xl mx-auto">
+                <div class="w-10 h-10 rounded-full bg-panel border border-gold flex items-center justify-center shrink-0 shadow-lg shadow-gold/20">
+                    <i class="fas fa-balance-scale text-gold"></i>
+                </div>
+                <div class="bg-panel border border-gray-800 p-4 rounded-2xl rounded-tr-none max-w-[85%] shadow-md">
+                    <p class="text-sm leading-relaxed">أهلاً بك أستاذ وسام في منصة "ميزان اليمن". أنا مساعدك القانوني الذكي. تفضل بطرح استشارتك أو قم برفع المرفقات لتحليلها.</p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="bg-panel border-t border-gray-800 p-3 sm:p-4 z-20">
+            <div class="max-w-4xl mx-auto flex items-end gap-2 bg-dark border border-gray-700 rounded-2xl p-2 focus-within:border-gold transition">
+                <button class="text-gray-400 hover:text-gold p-2 transition rounded-full hover:bg-gray-800 shrink-0">
+                    <i class="fas fa-paperclip text-lg"></i>
+                </button>
+                <button class="text-gray-400 hover:text-gold p-2 transition rounded-full hover:bg-gray-800 shrink-0">
+                    <i class="fas fa-camera text-lg"></i>
+                </button>
+                
+                <textarea id="userInput" placeholder="اكتب استشارتك القانونية هنا..." class="flex-1 bg-transparent text-white focus:outline-none resize-none max-h-32 min-h-[44px] py-2 px-2 text-sm sm:text-base" rows="1"></textarea>
+                
+                <button onclick="sendMessage()" class="bg-gold-btn w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-md transform hover:scale-105">
+                    <i class="fas fa-paper-plane mr-1"></i>
+                </button>
+            </div>
+        </footer>
     </div>
-  </section>
-</main>
 
-<div id="settingsModal" class="modal hidden fixed inset-0 z-[10000] bg-black/90 flex items-center justify-center p-4">
-  <div class="glass-panel w-full max-w-md p-8 rounded-3xl border-t-4 border-[#d4af37]">
-    <h3 class="text-xl font-bold text-[#d4af37] mb-6 flex items-center gap-2">🔑 إعدادات المفتاح السحابي</h3>
-    <div class="space-y-5">
-      <div>
-        <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2">Google Gemini API Key</label>
-        <input type="password" id="keyVal" placeholder="AIza..." class="w-full bg-[#080c14] border border-[#1e293b] p-4 rounded-xl text-sm focus:border-[#d4af37] outline-none">
-      </div>
-      <button onclick="window.saveKey()" id="btnSaveKey" class="w-full bg-[#d4af37] text-black font-bold py-4 rounded-xl shadow-lg">حفظ ومزامنة</button>
-      <button onclick="window.hideModal('settingsModal')" class="w-full text-slate-500 text-xs py-2">إغلاق</button>
-    </div>
-  </div>
-</div>
+    <script>
+        // محاكاة الاتصال لزر الدخول
+        setTimeout(() => {
+            const status = document.getElementById('loginStatus');
+            const btn = document.getElementById('loginBtn');
+            status.innerText = "الاتصال آمن. يمكنك الدخول";
+            status.className = "mt-4 text-sm text-green-400";
+        }, 1500);
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        function login() {
+            const user = document.getElementById('username').value;
+            if(user === 'admin') {
+                document.getElementById('loginBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الدخول...';
+                setTimeout(() => {
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('mainApp').classList.remove('hidden');
+                }, 800);
+            }
+        }
 
-// === مفاتيح Firebase الخاصة بك ===
-const firebaseConfig = {
-  apiKey: "AIzaSyDilXpLpGJ2NnL41liMJVftGHZAZUfx4A8",
-  authDomain: "mizan-yemen-3ecf6.firebaseapp.com",
-  projectId: "mizan-yemen-3ecf6",
-  storageBucket: "mizan-yemen-3ecf6.firebasestorage.app",
-  messagingSenderId: "422112658391",
-  appId: "1:422112658391:web:178f30d474a1485b890192"
-};
+        // فتح وإغلاق القائمة الجانبية
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        let isSidebarOpen = false;
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const appId = 'yemen-law-v1';
-// ===================================
+        function toggleSidebar() {
+            isSidebarOpen = !isSidebarOpen;
+            if(isSidebarOpen) {
+                sidebar.classList.remove('sidebar-closed');
+                sidebar.classList.add('sidebar-open');
+                overlay.classList.remove('overlay-closed');
+                overlay.classList.add('overlay-open');
+            } else {
+                sidebar.classList.remove('sidebar-open');
+                sidebar.classList.add('sidebar-closed');
+                overlay.classList.remove('overlay-open');
+                overlay.classList.add('overlay-closed');
+            }
+        }
 
-let user = null;
-let profile = { username: '', role: 'user' };
-let sysConfig = { apiKey: "" };
-let activeFile = null;
-let currentImg = null;
-let history = [];
-let mode = 'consult';
+        // تعديل ارتفاع حقل النص تلقائياً
+        const textarea = document.getElementById('userInput');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
 
-const startAuth = async () => {
-  try {
-    await signInAnonymously(auth);
-  } catch (e) { console.error(e); }
-};
+        // دالة إرسال الرسالة
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            if(!message) return;
 
-onAuthStateChanged(auth, async (u) => {
-  if (u) {
-    user = u;
-    document.getElementById('loginBtn').disabled = false;
-    document.getElementById('authStatus').textContent = "الاتصال آمن. يمكنك الدخول.";
-    document.getElementById('authStatus').classList.remove('animate-pulse');
-    document.getElementById('authStatus').classList.add('text-green-500');
+            const chatArea = document.getElementById('chatArea');
+            
+            // إضافة رسالة المستخدم
+            const userHtml = `
+                <div class="flex items-start gap-3 w-full max-w-4xl mx-auto flex-row-reverse">
+                    <div class="w-10 h-10 rounded-full bg-dark border border-gray-700 flex items-center justify-center shrink-0">
+                        <i class="fas fa-user text-gray-300"></i>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 p-4 rounded-2xl rounded-tl-none max-w-[85%] shadow-md">
+                        <p class="text-sm leading-relaxed">${message}</p>
+                    </div>
+                </div>
+            `;
+            chatArea.insertAdjacentHTML('beforeend', userHtml);
+            
+            input.value = '';
+            input.style.height = 'auto';
+            chatArea.scrollTop = chatArea.scrollHeight;
 
-    const setRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'config');
-    try {
-      const snap = await getDoc(setRef);
-      if (snap.exists()) {
-        sysConfig.apiKey = snap.data().apiKey || "";
-        document.getElementById('keyVal').value = sysConfig.apiKey;
-      }
-    } catch(e) {}
-
-    onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'library'), (s) => {
-      renderList('list-lib', s.docs.map(d => ({id: d.id, ...d.data()})), 'library');
-    }, (err) => {});
-    onSnapshot(collection(db, 'artifacts', appId, 'users', user.uid, 'personal'), (s) => {
-      renderList('list-pers', s.docs.map(d => ({id: d.id, ...d.data()})), 'personal');
-    }, (err) => {});
-  }
-});
-
-window.handleLogin = () => {
-  const u = document.getElementById('loginUsername').value.trim();
-  if(!u) return;
-  profile.username = u;
-  profile.role = u.toLowerCase() === 'admin' ? 'admin' : 'user';
-  document.getElementById('loginOverlay').style.display = 'none';
-  document.getElementById('userNameDisplay').textContent = profile.username;
-  document.getElementById('userRoleDisplay').textContent = profile.role === 'admin' ? 'مدير النظام' : 'باحث قانوني';
-  if (profile.role === 'admin') {
-    document.getElementById('adminTools').classList.remove('hidden');
-    document.querySelectorAll('.admin-only').forEach(e => e.classList.remove('hidden'));
-  }
-};
-
-window.saveKey = async () => {
-  if (!user) return;
-  const val = document.getElementById('keyVal').value.trim();
-  if(!val) return;
-  try {
-    const setRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'config');
-    await setDoc(setRef, { apiKey: val, lastUpdated: new Date().toISOString() });
-    sysConfig.apiKey = val;
-    window.hideModal('settingsModal');
-  } catch(e) {}
-};
-
-window.uploadToCloud = async (e, type) => {
-  const file = e.target.files[0];
-  if(!file || !user) return;
-  sysMsg(`جاري أرشفة الملف: ${file.name}...`);
-  try {
-    const text = await extract(file);
-    const colPath = type === 'library' 
-      ? collection(db, 'artifacts', appId, 'public', 'data', 'library')
-      : collection(db, 'artifacts', appId, 'users', user.uid, 'personal');
-    await setDoc(doc(colPath, `f_${Date.now()}`), { name: file.name, content: text, date: new Date().toISOString() });
-    sysMsg(`✅ تمت الأرشفة بنجاح.`);
-  } catch(err) { sysMsg(`❌ خطأ: ${err.message}`); }
-};
-
-async function extract(f) {
-  const ext = f.name.split('.').pop().toLowerCase();
-  if (ext === 'pdf') {
-    const buf = await f.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({data: buf}).promise;
-    let t = "";
-    for(let i=1; i<=pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      t += content.items.map(s => s.str).join(' ') + "\n";
-    }
-    return t;
-  } else if (ext === 'docx') {
-      const buf = await f.arrayBuffer();
-      const result = await mammoth.extractRawText({arrayBuffer: buf});
-      return result.value;
-  }
-  return await f.text();
-}
-
-function renderList(targetId, files, type) {
-  const list = document.getElementById(targetId);
-  list.innerHTML = files.length ? files.map(f => `
-    <div class="flex items-center justify-between p-2 rounded-lg bg-[#121926] border border-[#1e293b] hover:border-[#d4af37]/30 cursor-pointer group" onclick="window.setActive('${f.id}', '${f.name}', \`${f.content.replace(/`/g, '\\`').substring(0, 15000)}\`)">
-      <div class="flex items-center gap-2 overflow-hidden">
-        <span class="text-xs">${type === 'library' ? '📜' : '📄'}</span>
-        <span class="text-[10px] truncate text-slate-400 font-bold">${f.name}</span>
-      </div>
-      <button onclick="event.stopPropagation(); window.delFile('${f.id}', '${type}')" class="opacity-0 group-hover:opacity-100 text-red-500 text-[10px] px-1">✕</button>
-    </div>
-  `).join('') : `<div class="p-3 text-[10px] text-slate-600 text-center italic">لا يوجد ملفات</div>`;
-}
-
-window.setActive = (id, name, content) => {
-  activeFile = { id, name, content };
-  document.getElementById('activeBox').classList.remove('hidden');
-  document.getElementById('activeName').textContent = name;
-  sysMsg(`تم تفعيل ملف [${name}] كمرجع.`);
-};
-
-window.clearActive = () => {
-  activeFile = null;
-  document.getElementById('activeBox').classList.add('hidden');
-};
-
-window.delFile = async (id, type) => {
-  const ref = type === 'library' ? doc(db, 'artifacts', appId, 'public', 'data', 'library', id) : doc(db, 'artifacts', appId, 'users', user.uid, 'personal', id);
-  await deleteDoc(ref);
-};
-
-window.handleImg = (e) => {
-  const f = e.target.files[0];
-  if(!f) return;
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    currentImg = ev.target.result.split(',')[1];
-    document.getElementById('imgStatus').classList.remove('hidden');
-  };
-  reader.readAsDataURL(f);
-};
-
-window.removeImg = () => {
-    currentImg = null;
-    document.getElementById('imgStatus').classList.add('hidden');
-};
-
-window.setMode = (m) => {
-  mode = m;
-  const tags = { 'consult': 'وضع الاستشارة', 'analyze_judgment': 'تحليل منطوق الحكم', 'legal_draft': 'صياغة مسودة', 'evidence_check': 'فحص الأدلة' };
-  document.querySelectorAll('.law-btn').forEach(b => b.classList.remove('active-mode'));
-  document.getElementById(`mode-${m}`).classList.add('active-mode');
-  document.getElementById('modeTag').textContent = tags[m];
-};
-
-window.sendPrompt = async () => {
-  if(!sysConfig.apiKey) { window.showModal('settingsModal'); return; }
-  const inp = document.getElementById('promptInput');
-  const txt = inp.value.trim();
-  if(!txt && !currentImg) return;
-  inp.value = "";
-  const btn = document.getElementById('btnSend');
-  btn.disabled = true;
-  appendChat(txt || "تحليل المرفق", 'user');
-  const loader = appendLoader();
-  try {
-    let finalPrompt = txt;
-    if (activeFile) finalPrompt = `المرجع الحالي: [${activeFile.name}]\nمحتوى المستند: ${activeFile.content}\n\nالطلب: ${txt}`;
-    const parts = [{ text: finalPrompt }];
-    if(currentImg) parts.push({ inlineData: { mimeType: "image/png", data: currentImg } });
-    const aiRes = await callAIWithRetry(parts);
-    loader.remove();
-    appendChat(aiRes, 'ai');
-    window.removeImg();
-  } catch(e) {
-    loader.innerHTML = `<span class="text-red-400 text-xs font-bold">❌ ${e.message}</span>`;
-  } finally { btn.disabled = false; }
-};
-
-async function callAIWithRetry(parts, retries = 5) {
-  let delay = 1000;
-  for (let i = 0; i < retries; i++) {
-    try {
-      return await callAI(parts);
-    } catch (err) {
-      if (i === retries - 1) throw err;
-      await new Promise(r => setTimeout(r, delay));
-      delay *= 2;
-    }
-  }
-}
-
-async function callAI(parts) {
-  const model = "gemini-1.5-flash";
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${sysConfig.apiKey}`;
-  
-  const systemInstruction = `أنت "ميزان اليمن القضائي". خبير ومستشار قانوني يمني رصين.
-  سياق العمل الحالي: ${mode === 'analyze_judgment' ? 'تحليل منطوق الأحكام القضائية اليمنية واستنباط العيوب القانونية والحيثيات.' : 
-                     mode === 'legal_draft' ? 'صياغة مذكرات باللغة القانونية اليمنية الفصحى.' : 
-                     'تقديم استشارات قانونية دقيقة بناءً على القانون اليمني.'}
-  القواعد: إذا كان هناك مستند مرفق، ركز عليه كدليل أساسي.`;
-
-  const body = {
-    contents: [...history, { role: "user", parts }],
-    systemInstruction: { parts: [{ text: systemInstruction }] }
-  };
-
-  const res = await fetch(url, { 
-    method: "POST", 
-    headers: {"Content-Type":"application/json"}, 
-    body: JSON.stringify(body) 
-  });
-  
-  const data = await res.json();
-  if(!res.ok) {
-    throw new Error(data.error?.message || "خطأ في الاتصال بالموديل.");
-  }
-  
-  const out = data.candidates?.[0]?.content?.parts?.[0]?.text;
-  if(!out) throw new Error("لا يوجد رد.");
-  
-  history.push({ role: "user", parts });
-  history.push({ role: "model", parts: [{ text: out }] });
-  if(history.length > 10) history = history.slice(-10);
-  return out;
-}
-
-function appendChat(txt, sender) {
-  const box = document.getElementById('chatBox');
-  const div = document.createElement('div');
-  div.className = `flex gap-4 items-start ${sender === 'user' ? 'flex-row-reverse' : ''} animate-in fade-in duration-300`;
-  div.innerHTML = `
-    <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-lg ${sender === 'ai' ? 'bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20 shadow-inner' : 'bg-slate-800'}">
-      ${sender === 'ai' ? '⚖️' : '👤'}
-    </div>
-    <div class="${sender === 'ai' ? 'bg-[#121926] border border-[#1e293b]' : 'bg-[#1e293b]'} p-4 rounded-2xl max-w-[85%] text-sm leading-relaxed">
-      ${txt.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b class="text-[#d4af37]">$1</b>')}
-    </div>
-  `;
-  box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
-}
-
-function appendLoader() {
-  const box = document.getElementById('chatBox');
-  const div = document.createElement('div');
-  div.className = "flex gap-4 items-start";
-  div.innerHTML = `
-    <div class="w-8 h-8 rounded-lg bg-[#d4af37]/10 flex items-center justify-center">⚖️</div>
-    <div class="bg-[#121926] p-4 rounded-2xl border border-[#1e293b] flex gap-1 items-center">
-      <div class="typing-dot" style="animation-delay: 0s"></div>
-      <div class="typing-dot" style="animation-delay: 0.2s"></div>
-      <div class="typing-dot" style="animation-delay: 0.4s"></div>
-    </div>
-  `;
-  box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
-  return div;
-}
-
-function sysMsg(t) {
-  const box = document.getElementById('chatBox');
-  const d = document.createElement('div');
-  d.className = "text-center text-[9px] text-slate-500 py-2 border-y border-[#1e293b]/30 my-2";
-  d.textContent = t;
-  box.appendChild(d);
-  box.scrollTop = box.scrollHeight;
-}
-
-window.showModal = (id) => document.getElementById(id).classList.remove('hidden');
-window.hideModal = (id) => document.getElementById(id).classList.add('hidden');
-window.logout = () => location.reload();
-window.switchSideTab = (t) => {
-  document.getElementById('side-lib').classList.toggle('hidden', t !== 'lib');
-  document.getElementById('side-pers').classList.toggle('hidden', t !== 'pers');
-  document.getElementById('btn-lib').className = t === 'lib' ? 'flex-1 pb-2 text-[11px] font-bold border-b-2 border-[#d4af37] text-[#d4af37]' : 'flex-1 pb-2 text-[11px] font-bold text-slate-500';
-  document.getElementById('btn-pers').className = t === 'pers' ? 'flex-1 pb-2 text-[11px] font-bold border-b-2 border-[#d4af37] text-[#d4af37]' : 'flex-1 pb-2 text-[11px] font-bold text-slate-500';
-};
-startAuth();
-</script>
+            // محاكاة تفكير الذكاء الاصطناعي
+            setTimeout(() => {
+                const botHtml = `
+                    <div class="flex items-start gap-3 w-full max-w-4xl mx-auto">
+                        <div class="w-10 h-10 rounded-full bg-panel border border-gold flex items-center justify-center shrink-0 shadow-lg shadow-gold/20">
+                            <i class="fas fa-balance-scale text-gold"></i>
+                        </div>
+                        <div class="bg-panel border border-gray-800 p-4 rounded-2xl rounded-tr-none max-w-[85%] shadow-md">
+                            <p class="text-sm leading-relaxed text-gray-400 italic"><i class="fas fa-circle-notch fa-spin text-gold mr-2"></i>جاري تحليل الاستشارة بناءً على القانون اليمني...</p>
+                        </div>
+                    </div>
+                `;
+                chatArea.insertAdjacentHTML('beforeend', botHtml);
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }, 500);
+        }
+    </script>
 </body>
 </html>
