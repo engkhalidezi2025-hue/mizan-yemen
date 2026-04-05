@@ -13,15 +13,10 @@
             theme: {
                 extend: {
                     colors: {
-                        dark: '#080c14',
-                        darker: '#05080f',
-                        panel: '#121826',
-                        gold: '#d4af37',
-                        goldHover: '#b5952f'
+                        dark: '#080c14', darker: '#05080f', panel: '#121826',
+                        gold: '#d4af37', goldHover: '#b5952f'
                     },
-                    fontFamily: {
-                        sans: ['Tajawal', 'sans-serif'],
-                    }
+                    fontFamily: { sans: ['Tajawal', 'sans-serif'], }
                 }
             }
         }
@@ -32,36 +27,29 @@
         .border-gold { border-color: #d4af37; }
         .bg-gold-btn { background-color: #d4af37; color: #080c14; transition: all 0.3s ease; }
         .bg-gold-btn:hover { background-color: #b5952f; }
-        
-        /* تصميم سكرول بار أنيق */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #080c14; }
         ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
-        
-        /* حركات القائمة الجانبية */
         .sidebar-open { transform: translateX(0); }
         .sidebar-closed { transform: translateX(100%); }
-        .overlay-open { display: block; opacity: 1; }
-        .overlay-closed { display: none; opacity: 0; }
     </style>
 </head>
-<body class="font-sans antialiased h-screen flex flex-col relative">
+<body class="font-sans antialiased h-screen flex flex-col relative" onload="initDB()">
 
     <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-darker relative">
-        <div class="bg-panel border border-gray-800 rounded-2xl p-8 w-11/12 max-w-md shadow-2xl text-center shadow-gold/10 relative overflow-hidden z-10">
+        <div class="bg-panel border border-gray-800 rounded-2xl p-8 w-11/12 max-w-md shadow-2xl text-center shadow-gold/10 relative z-10">
             <div class="absolute top-0 left-0 w-full h-1 bg-gold"></div>
             <i class="fas fa-balance-scale text-5xl text-gold mb-4"></i>
             <h1 class="text-3xl font-bold mb-2 gold-gradient">ميزان اليمن</h1>
             <p class="text-gray-400 text-sm mb-8">بوابة العدالة والتحليل القانوني الذكي</p>
             
-            <input type="text" id="username" placeholder="اسم المستخدم (admin)" class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-3 mb-4 text-white focus:outline-none focus:border-gold transition text-center" value="admin">
-            <input type="password" id="password" placeholder="كلمة المرور" class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-3 mb-6 text-white focus:outline-none focus:border-gold transition text-center" value="123456">
+            <input type="text" id="username" placeholder="اسم المستخدم" class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-3 mb-4 text-white focus:outline-none focus:border-gold transition text-center">
+            <input type="password" id="password" placeholder="كلمة المرور" class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-3 mb-6 text-white focus:outline-none focus:border-gold transition text-center">
             
-            <button onclick="login()" id="loginBtn" class="w-full bg-gold-btn font-bold rounded-lg px-4 py-3 shadow-lg shadow-gold/20 flex justify-center items-center gap-2">
-                <span>دخول النظام</span>
-                <i class="fas fa-sign-in-alt"></i>
+            <button onclick="login()" id="loginBtn" class="w-full bg-gold-btn font-bold rounded-lg px-4 py-3 shadow-lg flex justify-center items-center gap-2">
+                <span>دخول النظام</span><i class="fas fa-sign-in-alt"></i>
             </button>
-            <p id="loginStatus" class="mt-4 text-sm text-gray-500">جاري تأمين الاتصال...</p>
+            <p id="loginError" class="mt-4 text-sm text-red-500 hidden"></p>
         </div>
 
         <div class="absolute bottom-4 left-0 w-full text-center text-xs leading-relaxed z-0 pb-2">
@@ -69,74 +57,58 @@
             <p class="text-gray-400"><span class="text-gold font-bold">فكرة وإعداد وإشراف /</span> م. خالد العزي</p>
             <div class="flex items-center justify-center gap-2 mt-1 text-gray-400">
                 <span class="text-gold font-bold">برمجة وتطوير:</span>
-                <span>م. خالد العزي 771893845</span>
-                <span class="text-gray-600">|</span>
-                <span>م. وسام محي الدين 770744040</span>
+                <span>م. خالد العزي 771893845</span> <span class="text-gray-600">|</span> <span>م. وسام محي الدين 770744040</span>
             </div>
         </div>
     </div>
 
     <div id="mainApp" class="hidden h-full flex flex-col relative">
-        
         <header class="bg-panel border-b border-gray-800 p-4 flex justify-between items-center z-30 shadow-md">
             <div class="flex items-center gap-3">
-                <button onclick="toggleSidebar()" class="text-gold text-2xl p-1 focus:outline-none">
-                    <i class="fas fa-bars"></i>
-                </button>
+                <button onclick="toggleSidebar()" class="text-gold text-2xl p-1"><i class="fas fa-bars"></i></button>
                 <div class="flex items-center gap-2">
                     <i class="fas fa-balance-scale text-gold text-xl"></i>
-                    <h1 class="text-lg font-bold text-white hidden sm:block">ميزان اليمن القضائي</h1>
+                    <h1 class="text-lg font-bold text-white hidden sm:block">ميزان اليمن</h1>
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <span class="text-sm text-gray-300 bg-dark px-3 py-1 rounded-full border border-gray-700"><i class="fas fa-user-tie text-gold ml-1"></i> مدير النظام</span>
+                <button onclick="logout()" class="text-sm text-red-400 hover:text-red-300 bg-dark px-3 py-1 rounded-full border border-red-900 transition"><i class="fas fa-sign-out-alt ml-1"></i>خروج</button>
+                <span id="headerRoleBadge" class="text-sm text-gray-300 bg-dark px-3 py-1 rounded-full border border-gray-700"></span>
             </div>
         </header>
 
-        <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-40 transition-opacity duration-300 overlay-closed"></div>
+        <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden"></div>
 
         <aside id="sidebar" class="fixed top-0 right-0 h-full w-72 bg-panel border-l border-gray-800 z-50 transition-transform duration-300 sidebar-closed flex flex-col shadow-2xl">
             <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-darker">
                 <h2 class="font-bold text-gold text-lg"><i class="fas fa-compass ml-2"></i>القائمة الرئيسية</h2>
-                <button onclick="toggleSidebar()" class="text-gray-400 hover:text-white text-xl">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button onclick="toggleSidebar()" class="text-gray-400 hover:text-white text-xl"><i class="fas fa-times"></i></button>
             </div>
             
             <div class="p-4 overflow-y-auto flex-1">
                 <div class="mb-6">
                     <h3 class="text-xs text-gray-500 mb-3 uppercase tracking-wider">أدوات التحليل</h3>
                     <ul class="space-y-2">
-                        <li><button class="w-full text-right p-3 rounded-lg bg-dark border border-gray-700 text-gold hover:bg-gray-800 transition"><i class="fas fa-file-contract ml-2 w-5"></i>تحليل العقود</button></li>
-                        <li><button class="w-full text-right p-3 rounded-lg hover:bg-dark text-gray-300 transition"><i class="fas fa-gavel ml-2 w-5"></i>السوابق القضائية</button></li>
+                        <li><button class="w-full text-right p-3 rounded-lg bg-dark border border-gray-700 text-gold hover:bg-gray-800"><i class="fas fa-file-contract ml-2 w-5"></i>تحليل العقود</button></li>
+                        <li><button class="w-full text-right p-3 rounded-lg hover:bg-dark text-gray-300"><i class="fas fa-gavel ml-2 w-5"></i>السوابق القضائية</button></li>
                     </ul>
                 </div>
                 
-                <div class="mb-6">
-                    <h3 class="text-xs text-gray-500 mb-3 uppercase tracking-wider">إدارة المستخدمين</h3>
+                <div id="adminMenu" class="mb-6 hidden">
+                    <h3 class="text-xs text-gray-500 mb-3 uppercase tracking-wider border-t border-gray-800 pt-4">لوحة التحكم</h3>
                     <ul class="space-y-2">
-                        <li><button class="w-full text-right p-3 rounded-lg hover:bg-dark text-gray-300 transition"><i class="fas fa-users ml-2 w-5 text-blue-400"></i>قائمة الباحثين</button></li>
-                        <li><button class="w-full text-right p-3 rounded-lg hover:bg-dark text-gray-300 transition"><i class="fas fa-user-shield ml-2 w-5 text-green-400"></i>صلاحيات الوصول</button></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h3 class="text-xs text-gray-500 mb-3 uppercase tracking-wider">المستندات المحفوظة</h3>
-                    <ul class="space-y-2">
-                        <li><button class="w-full text-right p-3 rounded-lg hover:bg-dark text-gray-300 transition text-sm"><i class="fas fa-folder-open ml-2 text-gold"></i>مسودة حكم مدني - تعز</button></li>
-                        <li><button class="w-full text-right p-3 rounded-lg hover:bg-dark text-gray-300 transition text-sm"><i class="fas fa-folder-open ml-2 text-gold"></i>عقد شراكة تجارية</button></li>
+                        <li><button onclick="openUserManagement()" class="w-full text-right p-3 rounded-lg hover:bg-dark text-white border border-blue-900 bg-blue-900/20 transition"><i class="fas fa-users-cog ml-2 w-5 text-blue-400"></i>إدارة المستخدمين</button></li>
                     </ul>
                 </div>
             </div>
 
             <div class="p-4 border-t border-gray-800 bg-darker text-xs text-gray-400 leading-relaxed text-right">
-                <p class="mb-2 text-center text-gray-500">الإصدار 1.0.0 &copy; 2026</p>
                 <div class="bg-dark p-3 rounded-lg border border-gray-800">
-                    <p class="mb-1"><span class="text-gold font-bold">فكرة وإعداد وإشراف /</span><br>م. خالد العزي</p>
+                    <p class="mb-1"><span class="text-gold font-bold">فكرة وإعداد وإشراف /</span> م. خالد العزي</p>
                     <div class="mt-2 pt-2 border-t border-gray-700">
                         <p class="text-gold font-bold mb-1">برمجة وتطوير:</p>
-                        <p class="mb-1 flex justify-between"><span>م. خالد العزي</span> <span class="text-gray-500" dir="ltr">771893845</span></p>
-                        <p class="flex justify-between"><span>م. وسام محي الدين</span> <span class="text-gray-500" dir="ltr">770744040</span></p>
+                        <p class="mb-1 flex justify-between"><span>م. خالد العزي</span> <span dir="ltr">771893845</span></p>
+                        <p class="flex justify-between"><span>م. وسام محي الدين</span> <span dir="ltr">770744040</span></p>
                     </div>
                 </div>
             </div>
@@ -144,54 +116,208 @@
 
         <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-darker flex flex-col gap-4" id="chatArea">
             <div class="flex items-start gap-3 w-full max-w-4xl mx-auto">
-                <div class="w-10 h-10 rounded-full bg-panel border border-gold flex items-center justify-center shrink-0 shadow-lg shadow-gold/20">
+                <div class="w-10 h-10 rounded-full bg-panel border border-gold flex items-center justify-center shrink-0">
                     <i class="fas fa-balance-scale text-gold"></i>
                 </div>
                 <div class="bg-panel border border-gray-800 p-4 rounded-2xl rounded-tr-none max-w-[85%] shadow-md">
-                    <p class="text-sm leading-relaxed">أهلاً بك أستاذ وسام في منصة "ميزان اليمن". أنا مساعدك القانوني الذكي. تفضل بطرح استشارتك أو قم برفع المرفقات لتحليلها.</p>
+                    <p id="welcomeMessage" class="text-sm leading-relaxed text-gold font-bold"></p>
+                    <p class="text-sm leading-relaxed mt-2">أنا مساعدك القانوني الذكي. تفضل بطرح استشارتك أو قم برفع المرفقات لتحليلها.</p>
                 </div>
             </div>
         </main>
 
         <footer class="bg-panel border-t border-gray-800 p-3 sm:p-4 z-20">
-            <div class="max-w-4xl mx-auto flex items-end gap-2 bg-dark border border-gray-700 rounded-2xl p-2 focus-within:border-gold transition">
-                <button class="text-gray-400 hover:text-gold p-2 transition rounded-full hover:bg-gray-800 shrink-0">
-                    <i class="fas fa-paperclip text-lg"></i>
-                </button>
-                <button class="text-gray-400 hover:text-gold p-2 transition rounded-full hover:bg-gray-800 shrink-0">
-                    <i class="fas fa-camera text-lg"></i>
-                </button>
-                
-                <textarea id="userInput" placeholder="اكتب استشارتك القانونية هنا..." class="flex-1 bg-transparent text-white focus:outline-none resize-none max-h-32 min-h-[44px] py-2 px-2 text-sm sm:text-base" rows="1"></textarea>
-                
-                <button onclick="sendMessage()" class="bg-gold-btn w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-md transform hover:scale-105">
-                    <i class="fas fa-paper-plane mr-1"></i>
-                </button>
+            <div class="max-w-4xl mx-auto flex items-end gap-2 bg-dark border border-gray-700 rounded-2xl p-2">
+                <textarea id="userInput" placeholder="اكتب استشارتك القانونية..." class="flex-1 bg-transparent text-white focus:outline-none resize-none max-h-32 min-h-[44px] py-2 px-2 text-sm sm:text-base" rows="1"></textarea>
+                <button class="bg-gold-btn w-11 h-11 rounded-full flex items-center justify-center shrink-0"><i class="fas fa-paper-plane mr-1"></i></button>
             </div>
         </footer>
     </div>
 
-    <script>
-        // محاكاة الاتصال لزر الدخول
-        setTimeout(() => {
-            const status = document.getElementById('loginStatus');
-            const btn = document.getElementById('loginBtn');
-            status.innerText = "الاتصال آمن. يمكنك الدخول";
-            status.className = "mt-4 text-sm text-green-400";
-        }, 1500);
+    <div id="userManagementModal" class="fixed inset-0 bg-black/80 z-50 hidden flex-col items-center justify-center p-4">
+        <div class="bg-panel border border-gold rounded-xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl">
+            <div class="p-4 border-b border-gray-800 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-gold"><i class="fas fa-users-cog ml-2"></i>إدارة المستخدمين والصلاحيات</h2>
+                <button onclick="closeUserManagement()" class="text-gray-400 hover:text-white text-xl"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="p-4 bg-dark border-b border-gray-800 flex flex-wrap gap-2">
+                <input type="text" id="newFullName" placeholder="الاسم الكامل" class="bg-panel border border-gray-700 rounded px-3 py-2 text-sm text-white flex-1 min-w-[150px]">
+                <input type="text" id="newUsername" placeholder="اسم المستخدم" class="bg-panel border border-gray-700 rounded px-3 py-2 text-sm text-white flex-1 min-w-[120px]">
+                <input type="text" id="newPassword" placeholder="كلمة المرور" class="bg-panel border border-gray-700 rounded px-3 py-2 text-sm text-white flex-1 min-w-[120px]">
+                <select id="newRole" class="bg-panel border border-gray-700 rounded px-3 py-2 text-sm text-white">
+                    <option value="user">باحث / مستخدم</option>
+                    <option value="admin">مشرف نظام</option>
+                </select>
+                <button onclick="addUser()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded text-sm font-bold"><i class="fas fa-plus ml-1"></i>إضافة</button>
+            </div>
 
-        function login() {
-            const user = document.getElementById('username').value;
-            if(user === 'admin') {
-                document.getElementById('loginBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الدخول...';
-                setTimeout(() => {
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('mainApp').classList.remove('hidden');
-                }, 800);
+            <div class="p-4 overflow-y-auto flex-1">
+                <table class="w-full text-sm text-right text-gray-300">
+                    <thead class="text-xs text-gray-400 uppercase bg-dark">
+                        <tr>
+                            <th class="px-4 py-3 rounded-tr-lg">الاسم الكامل</th>
+                            <th class="px-4 py-3">اسم المستخدم</th>
+                            <th class="px-4 py-3">كلمة المرور</th>
+                            <th class="px-4 py-3">الصلاحية</th>
+                            <th class="px-4 py-3">الحالة</th>
+                            <th class="px-4 py-3 rounded-tl-lg text-center">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody" class="divide-y divide-gray-800">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- نظام قاعدة البيانات المصغرة (المحلي) ---
+        let usersDB = [];
+        let currentUser = null;
+
+        function initDB() {
+            const storedUsers = localStorage.getItem('mizanUsers');
+            if (storedUsers) {
+                usersDB = JSON.parse(storedUsers);
+            } else {
+                // إنشاء المشرف الافتراضي لأول مرة
+                usersDB = [{
+                    id: 1, fullName: 'مدير النظام الأول', username: 'admin', password: '123', role: 'admin', status: 'active'
+                }];
+                saveDB();
             }
         }
 
-        // فتح وإغلاق القائمة الجانبية
+        function saveDB() {
+            localStorage.setItem('mizanUsers', JSON.stringify(usersDB));
+        }
+
+        // --- نظام تسجيل الدخول ---
+        function login() {
+            const userVal = document.getElementById('username').value.trim();
+            const passVal = document.getElementById('password').value.trim();
+            const errorMsg = document.getElementById('loginError');
+
+            const foundUser = usersDB.find(u => u.username === userVal && u.password === passVal);
+
+            if (foundUser) {
+                if (foundUser.status === 'inactive') {
+                    errorMsg.innerText = "عفواً، تم إيقاف حسابك من قبل الإدارة.";
+                    errorMsg.classList.remove('hidden');
+                    return;
+                }
+
+                currentUser = foundUser;
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainApp').classList.remove('hidden');
+                
+                // تخصيص الواجهة حسب الصلاحية
+                document.getElementById('welcomeMessage').innerText = `أهلاً بك أستاذ ${currentUser.fullName}،`;
+                
+                if(currentUser.role === 'admin') {
+                    document.getElementById('adminMenu').classList.remove('hidden');
+                    document.getElementById('headerRoleBadge').innerHTML = '<i class="fas fa-crown text-gold ml-1"></i> مشرف نظام';
+                } else {
+                    document.getElementById('adminMenu').classList.add('hidden');
+                    document.getElementById('headerRoleBadge').innerHTML = '<i class="fas fa-user text-blue-400 ml-1"></i> باحث قانوني';
+                }
+            } else {
+                errorMsg.innerText = "اسم المستخدم أو كلمة المرور غير صحيحة.";
+                errorMsg.classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginError').classList.add('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginScreen').style.display = 'flex';
+            if(isSidebarOpen) toggleSidebar();
+        }
+
+        // --- نظام إدارة المستخدمين للمشرف ---
+        function openUserManagement() {
+            toggleSidebar();
+            document.getElementById('userManagementModal').classList.remove('hidden');
+            document.getElementById('userManagementModal').classList.add('flex');
+            renderUsers();
+        }
+
+        function closeUserManagement() {
+            document.getElementById('userManagementModal').classList.add('hidden');
+            document.getElementById('userManagementModal').classList.remove('flex');
+        }
+
+        function renderUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            
+            usersDB.forEach(u => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-dark transition";
+                tr.innerHTML = `
+                    <td class="px-4 py-3">${u.fullName}</td>
+                    <td class="px-4 py-3 text-gold">${u.username}</td>
+                    <td class="px-4 py-3">
+                        <input type="text" value="${u.password}" id="pass-${u.id}" class="bg-transparent border-b border-gray-700 w-20 text-center focus:border-gold outline-none" onchange="updateUserField(${u.id}, 'password', this.value)">
+                    </td>
+                    <td class="px-4 py-3">${u.role === 'admin' ? '<span class="text-xs bg-gold/20 text-gold px-2 py-1 rounded">مشرف</span>' : '<span class="text-xs bg-blue-900/40 text-blue-400 px-2 py-1 rounded">باحث</span>'}</td>
+                    <td class="px-4 py-3">
+                        <button onclick="toggleUserStatus(${u.id})" class="text-xs px-2 py-1 rounded ${u.status === 'active' ? 'bg-green-900/40 text-green-400' : 'bg-red-900/40 text-red-400'}">
+                            ${u.status === 'active' ? 'مفعل' : 'موقوف'}
+                        </button>
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <button onclick="deleteUser(${u.id})" class="text-red-500 hover:text-red-400 p-1" title="حذف المستخدم"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function addUser() {
+            const fName = document.getElementById('newFullName').value.trim();
+            const uName = document.getElementById('newUsername').value.trim();
+            const pass = document.getElementById('newPassword').value.trim();
+            const role = document.getElementById('newRole').value;
+
+            if(!fName || !uName || !pass) return alert("الرجاء تعبئة جميع الحقول!");
+            if(usersDB.find(u => u.username === uName)) return alert("اسم المستخدم موجود مسبقاً!");
+
+            usersDB.push({
+                id: Date.now(), fullName: fName, username: uName, password: pass, role: role, status: 'active'
+            });
+            saveDB(); renderUsers();
+            
+            document.getElementById('newFullName').value = '';
+            document.getElementById('newUsername').value = '';
+            document.getElementById('newPassword').value = '';
+        }
+
+        function updateUserField(id, field, value) {
+            const user = usersDB.find(u => u.id === id);
+            if(user) { user[field] = value; saveDB(); }
+        }
+
+        function toggleUserStatus(id) {
+            const user = usersDB.find(u => u.id === id);
+            if(user) {
+                user.status = user.status === 'active' ? 'inactive' : 'active';
+                saveDB(); renderUsers();
+            }
+        }
+
+        function deleteUser(id) {
+            if(confirm("هل أنت متأكد من حذف هذا المستخدم نهائياً؟")) {
+                usersDB = usersDB.filter(u => u.id !== id);
+                saveDB(); renderUsers();
+            }
+        }
+
+        // --- واجهة المستخدم (UI) ---
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
         let isSidebarOpen = false;
@@ -200,64 +326,11 @@
             isSidebarOpen = !isSidebarOpen;
             if(isSidebarOpen) {
                 sidebar.classList.remove('sidebar-closed');
-                sidebar.classList.add('sidebar-open');
-                overlay.classList.remove('overlay-closed');
-                overlay.classList.add('overlay-open');
+                overlay.classList.remove('hidden');
             } else {
-                sidebar.classList.remove('sidebar-open');
                 sidebar.classList.add('sidebar-closed');
-                overlay.classList.remove('overlay-open');
-                overlay.classList.add('overlay-closed');
+                overlay.classList.add('hidden');
             }
-        }
-
-        // تعديل ارتفاع حقل النص تلقائياً
-        const textarea = document.getElementById('userInput');
-        textarea.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
-        });
-
-        // دالة إرسال الرسالة
-        function sendMessage() {
-            const input = document.getElementById('userInput');
-            const message = input.value.trim();
-            if(!message) return;
-
-            const chatArea = document.getElementById('chatArea');
-            
-            // إضافة رسالة المستخدم
-            const userHtml = `
-                <div class="flex items-start gap-3 w-full max-w-4xl mx-auto flex-row-reverse">
-                    <div class="w-10 h-10 rounded-full bg-dark border border-gray-700 flex items-center justify-center shrink-0">
-                        <i class="fas fa-user text-gray-300"></i>
-                    </div>
-                    <div class="bg-gray-800 border border-gray-700 p-4 rounded-2xl rounded-tl-none max-w-[85%] shadow-md">
-                        <p class="text-sm leading-relaxed">${message}</p>
-                    </div>
-                </div>
-            `;
-            chatArea.insertAdjacentHTML('beforeend', userHtml);
-            
-            input.value = '';
-            input.style.height = 'auto';
-            chatArea.scrollTop = chatArea.scrollHeight;
-
-            // محاكاة تفكير الذكاء الاصطناعي
-            setTimeout(() => {
-                const botHtml = `
-                    <div class="flex items-start gap-3 w-full max-w-4xl mx-auto">
-                        <div class="w-10 h-10 rounded-full bg-panel border border-gold flex items-center justify-center shrink-0 shadow-lg shadow-gold/20">
-                            <i class="fas fa-balance-scale text-gold"></i>
-                        </div>
-                        <div class="bg-panel border border-gray-800 p-4 rounded-2xl rounded-tr-none max-w-[85%] shadow-md">
-                            <p class="text-sm leading-relaxed text-gray-400 italic"><i class="fas fa-circle-notch fa-spin text-gold mr-2"></i>جاري تحليل الاستشارة بناءً على القانون اليمني...</p>
-                        </div>
-                    </div>
-                `;
-                chatArea.insertAdjacentHTML('beforeend', botHtml);
-                chatArea.scrollTop = chatArea.scrollHeight;
-            }, 500);
         }
     </script>
 </body>
