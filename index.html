@@ -24,7 +24,6 @@
     <style>
         body { background-color: #05080f; color: #ffffff; overflow-x: hidden; }
         .gold-gradient { background: linear-gradient(135deg, #d4af37 0%, #b5952f 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .border-gold { border-color: #d4af37; }
         .bg-gold-btn { background-color: #d4af37; color: #080c14; transition: all 0.3s ease; }
         .bg-gold-btn:hover { background-color: #b5952f; }
         ::-webkit-scrollbar { width: 6px; }
@@ -32,6 +31,7 @@
         ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
         .sidebar-open { transform: translateX(0); }
         .sidebar-closed { transform: translateX(100%); }
+        #chatArea p { margin-bottom: 10px; line-height: 1.6; }
     </style>
 </head>
 <body class="font-sans antialiased h-screen flex flex-col relative" onload="initDB()">
@@ -51,14 +51,9 @@
             </button>
             <p id="loginError" class="mt-4 text-sm text-red-500 hidden"></p>
         </div>
-
-        <div class="absolute bottom-4 left-0 w-full text-center text-xs leading-relaxed z-0 pb-2">
-            <p class="text-gray-500 mb-1">جميع الحقوق محفوظة &copy; 2026</p>
-            <p class="text-gray-400"><span class="text-gold font-bold">فكرة وإعداد وإشراف /</span> م. خالد العزي</p>
-            <div class="flex items-center justify-center gap-2 mt-1 text-gray-400">
-                <span class="text-gold font-bold">برمجة وتطوير:</span>
-                <span>م. خالد العزي 771893845</span> <span class="text-gray-600">|</span> <span>م. وسام محي الدين 770744040</span>
-            </div>
+        <div class="absolute bottom-4 left-0 w-full text-center text-xs leading-relaxed z-0 pb-2 text-gray-500">
+            <p>فكرة وإعداد وإشراف / م. خالد العزي</p>
+            <p>برمجة وتطوير: م. خالد العزي & م. وسام محي الدين</p>
         </div>
     </div>
 
@@ -72,8 +67,8 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <button onclick="logout()" class="text-sm text-red-400 hover:text-red-300 bg-dark px-3 py-1 rounded-full border border-red-900 transition"><i class="fas fa-sign-out-alt ml-1"></i>خروج</button>
-                <span id="headerRoleBadge" class="text-sm text-gray-300 bg-dark px-3 py-1 rounded-full border border-gray-700"></span>
+                <button onclick="logout()" class="text-xs text-red-400 bg-dark px-3 py-1 rounded-full border border-red-900">خروج</button>
+                <span id="headerRoleBadge" class="text-xs text-gray-300 bg-dark px-3 py-1 rounded-full border border-gray-700"></span>
             </div>
         </header>
 
@@ -81,55 +76,38 @@
 
         <aside id="sidebar" class="fixed top-0 right-0 h-full w-72 bg-panel border-l border-gray-800 z-50 transition-transform duration-300 sidebar-closed flex flex-col shadow-2xl">
             <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-darker">
-                <h2 class="font-bold text-gold text-lg"><i class="fas fa-compass ml-2"></i>القائمة الرئيسية</h2>
-                <button onclick="toggleSidebar()" class="text-gray-400 hover:text-white text-xl"><i class="fas fa-times"></i></button>
+                <h2 class="font-bold text-gold text-lg">الخدمات القانونية</h2>
+                <button onclick="toggleSidebar()" class="text-gray-400 text-xl"><i class="fas fa-times"></i></button>
             </div>
-            
-            <div class="p-4 overflow-y-auto flex-1">
-                <div class="mb-6">
-                    <h3 class="text-xs text-gray-500 mb-3 uppercase tracking-wider">أدوات التحليل</h3>
-                    <ul class="space-y-2">
-                        <li><button class="w-full text-right p-3 rounded-lg bg-dark border border-gray-700 text-gold hover:bg-gray-800"><i class="fas fa-file-contract ml-2 w-5"></i>تحليل العقود</button></li>
-                        <li><button class="w-full text-right p-3 rounded-lg hover:bg-dark text-gray-300"><i class="fas fa-gavel ml-2 w-5"></i>السوابق القضائية</button></li>
-                    </ul>
-                </div>
-                
-                <div id="adminMenu" class="mb-6 hidden">
-                    <h3 class="text-xs text-gray-500 mb-3 uppercase tracking-wider border-t border-gray-800 pt-4">لوحة التحكم</h3>
-                    <ul class="space-y-2">
-                        <li><button onclick="openUserManagement()" class="w-full text-right p-3 rounded-lg hover:bg-dark text-white border border-blue-900 bg-blue-900/20 transition"><i class="fas fa-users-cog ml-2 w-5 text-blue-400"></i>إدارة المستخدمين</button></li>
-                    </ul>
+            <div class="p-4 overflow-y-auto flex-1 space-y-4">
+                <button onclick="setMode('استشارة قانونية')" class="w-full text-right p-3 rounded-lg bg-dark border border-gray-700 text-gold hover:bg-gray-800 transition"><i class="fas fa-comments ml-2"></i>استشارة قانونية</button>
+                <button onclick="setMode('صياغة دعوى')" class="w-full text-right p-3 rounded-lg hover:bg-dark text-gray-300 transition"><i class="fas fa-pen-nib ml-2"></i>صياغة دعوى</button>
+                <button onclick="setMode('نقد حكم قضائي')" class="w-full text-right p-3 rounded-lg hover:bg-dark text-gray-300 transition"><i class="fas fa-gavel ml-2"></i>نقد حكم قضائي</button>
+                <div id="adminMenu" class="border-t border-gray-800 pt-4 hidden">
+                    <button onclick="openUserManagement()" class="w-full text-right p-3 rounded-lg bg-blue-900/20 text-blue-400 border border-blue-900 transition"><i class="fas fa-users-cog ml-2"></i>إدارة المستخدمين</button>
                 </div>
             </div>
-
-            <div class="p-4 border-t border-gray-800 bg-darker text-xs text-gray-400 leading-relaxed text-right">
-                <div class="bg-dark p-3 rounded-lg border border-gray-800">
-                    <p class="mb-1"><span class="text-gold font-bold">فكرة وإعداد وإشراف /</span> م. خالد العزي</p>
-                    <div class="mt-2 pt-2 border-t border-gray-700">
-                        <p class="text-gold font-bold mb-1">برمجة وتطوير:</p>
-                        <p class="mb-1 flex justify-between"><span>م. خالد العزي</span> <span dir="ltr">771893845</span></p>
-                        <p class="flex justify-between"><span>م. وسام محي الدين</span> <span dir="ltr">770744040</span></p>
-                    </div>
-                </div>
+            <div class="p-4 border-t border-gray-800 text-[10px] text-gray-500 text-center leading-tight">
+                فكرة وإشراف: م. خالد العزي<br>برمجة: م. خالد العزي وم. وسام محي الدين
             </div>
         </aside>
 
         <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-darker flex flex-col gap-4" id="chatArea">
             <div class="flex items-start gap-3 w-full max-w-4xl mx-auto">
-                <div class="w-10 h-10 rounded-full bg-panel border border-gold flex items-center justify-center shrink-0">
-                    <i class="fas fa-balance-scale text-gold"></i>
-                </div>
+                <div class="w-10 h-10 rounded-full bg-panel border border-gold flex items-center justify-center shrink-0"><i class="fas fa-balance-scale text-gold"></i></div>
                 <div class="bg-panel border border-gray-800 p-4 rounded-2xl rounded-tr-none max-w-[85%] shadow-md">
-                    <p id="welcomeMessage" class="text-sm leading-relaxed text-gold font-bold"></p>
-                    <p class="text-sm leading-relaxed mt-2">أنا مساعدك القانوني الذكي. تفضل بطرح استشارتك أو قم برفع المرفقات لتحليلها.</p>
+                    <p id="welcomeMessage" class="text-sm font-bold text-gold"></p>
+                    <p class="text-sm mt-1">أنا مستشارك القضائي اليمني. اختر نوع الخدمة وابدأ بطرح قضيتك بناءً على المراجع المرفقة.</p>
                 </div>
             </div>
         </main>
 
         <footer class="bg-panel border-t border-gray-800 p-3 sm:p-4 z-20">
-            <div class="max-w-4xl mx-auto flex items-end gap-2 bg-dark border border-gray-700 rounded-2xl p-2">
-                <textarea id="userInput" placeholder="اكتب استشارتك القانونية..." class="flex-1 bg-transparent text-white focus:outline-none resize-none max-h-32 min-h-[44px] py-2 px-2 text-sm sm:text-base" rows="1"></textarea>
-                <button class="bg-gold-btn w-11 h-11 rounded-full flex items-center justify-center shrink-0"><i class="fas fa-paper-plane mr-1"></i></button>
+            <div class="max-w-4xl mx-auto flex items-end gap-2 bg-dark border border-gray-700 rounded-2xl p-2 focus-within:border-gold">
+                <textarea id="userInput" placeholder="اكتب استفسارك القانوني..." class="flex-1 bg-transparent text-white focus:outline-none resize-none max-h-32 min-h-[44px] py-2 px-2 text-sm sm:text-base" rows="1"></textarea>
+                <button onclick="sendMessage()" id="sendBtn" class="bg-gold-btn w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-md">
+                    <i class="fas fa-paper-plane mr-1"></i>
+                </button>
             </div>
         </footer>
     </div>
@@ -137,201 +115,142 @@
     <div id="userManagementModal" class="fixed inset-0 bg-black/80 z-50 hidden flex-col items-center justify-center p-4">
         <div class="bg-panel border border-gold rounded-xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl">
             <div class="p-4 border-b border-gray-800 flex justify-between items-center">
-                <h2 class="text-lg font-bold text-gold"><i class="fas fa-users-cog ml-2"></i>إدارة المستخدمين والصلاحيات</h2>
-                <button onclick="closeUserManagement()" class="text-gray-400 hover:text-white text-xl"><i class="fas fa-times"></i></button>
+                <h2 class="text-lg font-bold text-gold">إدارة المستخدمين</h2>
+                <button onclick="closeUserManagement()" class="text-gray-400 text-xl"><i class="fas fa-times"></i></button>
             </div>
-            
-            <div class="p-4 bg-dark border-b border-gray-800 flex flex-wrap gap-2">
-                <input type="text" id="newFullName" placeholder="الاسم الكامل" class="bg-panel border border-gray-700 rounded px-3 py-2 text-sm text-white flex-1 min-w-[150px]">
-                <input type="text" id="newUsername" placeholder="اسم المستخدم" class="bg-panel border border-gray-700 rounded px-3 py-2 text-sm text-white flex-1 min-w-[120px]">
-                <input type="text" id="newPassword" placeholder="كلمة المرور" class="bg-panel border border-gray-700 rounded px-3 py-2 text-sm text-white flex-1 min-w-[120px]">
-                <select id="newRole" class="bg-panel border border-gray-700 rounded px-3 py-2 text-sm text-white">
-                    <option value="user">باحث / مستخدم</option>
-                    <option value="admin">مشرف نظام</option>
-                </select>
-                <button onclick="addUser()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded text-sm font-bold"><i class="fas fa-plus ml-1"></i>إضافة</button>
-            </div>
-
-            <div class="p-4 overflow-y-auto flex-1">
+            <div class="p-4 bg-dark overflow-y-auto flex-1">
                 <table class="w-full text-sm text-right text-gray-300">
-                    <thead class="text-xs text-gray-400 uppercase bg-dark">
-                        <tr>
-                            <th class="px-4 py-3 rounded-tr-lg">الاسم الكامل</th>
-                            <th class="px-4 py-3">اسم المستخدم</th>
-                            <th class="px-4 py-3">كلمة المرور</th>
-                            <th class="px-4 py-3">الصلاحية</th>
-                            <th class="px-4 py-3">الحالة</th>
-                            <th class="px-4 py-3 rounded-tl-lg text-center">الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usersTableBody" class="divide-y divide-gray-800">
-                        </tbody>
+                    <tbody id="usersTableBody"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <script>
-        // --- نظام قاعدة البيانات المصغرة (المحلي) ---
+        // --- الإعدادات السحابية (Dify API) ---
+        const DIFY_API_KEY = 'app-fIKGX7KXLxxm4recWAgn2jlN';
+        const DIFY_BASE_URL = 'https://api.dify.ai/v1/chat-messages';
+        let currentMode = "استشارة قانونية";
+
+        function setMode(mode) {
+            currentMode = mode;
+            alert(`تم تفعيل وضع: ${mode}`);
+            toggleSidebar();
+        }
+
+        // --- نظام المستخدمين المحلي ---
         let usersDB = [];
         let currentUser = null;
 
         function initDB() {
-            const storedUsers = localStorage.getItem('mizanUsers');
-            if (storedUsers) {
-                usersDB = JSON.parse(storedUsers);
-            } else {
-                // إنشاء المشرف الافتراضي لأول مرة
-                usersDB = [{
-                    id: 1, fullName: 'مدير النظام الأول', username: 'admin', password: '123', role: 'admin', status: 'active'
-                }];
+            const stored = localStorage.getItem('mizanUsers');
+            if (stored) { usersDB = JSON.parse(stored); } 
+            else {
+                usersDB = [{id: 1, fullName: 'مدير النظام', username: 'admin', password: '123', role: 'admin', status: 'active'}];
                 saveDB();
             }
         }
+        function saveDB() { localStorage.setItem('mizanUsers', JSON.stringify(usersDB)); }
 
-        function saveDB() {
-            localStorage.setItem('mizanUsers', JSON.stringify(usersDB));
-        }
-
-        // --- نظام تسجيل الدخول ---
         function login() {
-            const userVal = document.getElementById('username').value.trim();
-            const passVal = document.getElementById('password').value.trim();
-            const errorMsg = document.getElementById('loginError');
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
+            const found = usersDB.find(user => user.username === u && user.password === p);
 
-            const foundUser = usersDB.find(u => u.username === userVal && u.password === passVal);
-
-            if (foundUser) {
-                if (foundUser.status === 'inactive') {
-                    errorMsg.innerText = "عفواً، تم إيقاف حسابك من قبل الإدارة.";
-                    errorMsg.classList.remove('hidden');
-                    return;
-                }
-
-                currentUser = foundUser;
+            if (found && found.status === 'active') {
+                currentUser = found;
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('mainApp').classList.remove('hidden');
-                
-                // تخصيص الواجهة حسب الصلاحية
                 document.getElementById('welcomeMessage').innerText = `أهلاً بك أستاذ ${currentUser.fullName}،`;
+                document.getElementById('headerRoleBadge').innerText = currentUser.role === 'admin' ? 'مشرف' : 'باحث';
+                if(currentUser.role === 'admin') document.getElementById('adminMenu').classList.remove('hidden');
+            } else {
+                alert("بيانات الدخول خاطئة أو الحساب موقوف.");
+            }
+        }
+
+        function logout() { location.reload(); }
+
+        // --- محرك الإرسال الحقيقي (Dify Integration) ---
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const btn = document.getElementById('sendBtn');
+            const query = input.value.trim();
+            if (!query) return;
+
+            // إظهار رسالة المستخدم في الواجهة
+            appendMessage('user', query);
+            input.value = '';
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            // إضافة رسالة "جاري التفكير"
+            const loadingId = appendMessage('bot', '<i class="fas fa-balance-scale fa-beat text-gold"></i> جاري البحث في المراجع القانونية اليمنية والتحليل...');
+
+            try {
+                const response = await fetch(DIFY_BASE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${DIFY_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        inputs: { "MODE": currentMode },
+                        query: query,
+                        response_mode: "blocking",
+                        user: currentUser.username
+                    })
+                });
+
+                const data = await response.json();
                 
-                if(currentUser.role === 'admin') {
-                    document.getElementById('adminMenu').classList.remove('hidden');
-                    document.getElementById('headerRoleBadge').innerHTML = '<i class="fas fa-crown text-gold ml-1"></i> مشرف نظام';
-                } else {
-                    document.getElementById('adminMenu').classList.add('hidden');
-                    document.getElementById('headerRoleBadge').innerHTML = '<i class="fas fa-user text-blue-400 ml-1"></i> باحث قانوني';
-                }
-            } else {
-                errorMsg.innerText = "اسم المستخدم أو كلمة المرور غير صحيحة.";
-                errorMsg.classList.remove('hidden');
+                // إزالة رسالة التحميل ووضع الرد الحقيقي
+                document.getElementById(loadingId).innerHTML = formatBotResponse(data.answer);
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById(loadingId).innerHTML = "عفواً، فشل الاتصال بالعقل السحابي. تأكد من تشغيل الـ VPN في اليمن.";
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane mr-1"></i>';
+                document.getElementById('chatArea').scrollTop = document.getElementById('chatArea').scrollHeight;
             }
         }
 
-        function logout() {
-            currentUser = null;
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            document.getElementById('loginError').classList.add('hidden');
-            document.getElementById('mainApp').classList.add('hidden');
-            document.getElementById('loginScreen').style.display = 'flex';
-            if(isSidebarOpen) toggleSidebar();
+        function appendMessage(type, text) {
+            const id = 'msg-' + Date.now();
+            const chatArea = document.getElementById('chatArea');
+            const isBot = type === 'bot';
+            const html = `
+                <div class="flex items-start gap-3 w-full max-w-4xl mx-auto ${!isBot ? 'flex-row-reverse' : ''}">
+                    <div class="w-10 h-10 rounded-full bg-panel border ${isBot ? 'border-gold' : 'border-gray-700'} flex items-center justify-center shrink-0">
+                        <i class="fas ${isBot ? 'fa-balance-scale text-gold' : 'fa-user text-gray-400'}"></i>
+                    </div>
+                    <div id="${id}" class="p-4 rounded-2xl ${isBot ? 'bg-panel border border-gray-800 rounded-tr-none' : 'bg-gray-800 border border-gray-700 rounded-tl-none'} max-w-[85%] shadow-md text-sm leading-relaxed">
+                        ${text}
+                    </div>
+                </div>
+            `;
+            chatArea.insertAdjacentHTML('beforeend', html);
+            chatArea.scrollTop = chatArea.scrollHeight;
+            return id;
         }
 
-        // --- نظام إدارة المستخدمين للمشرف ---
-        function openUserManagement() {
-            toggleSidebar();
-            document.getElementById('userManagementModal').classList.remove('hidden');
-            document.getElementById('userManagementModal').classList.add('flex');
-            renderUsers();
+        function formatBotResponse(text) {
+            // تحويل السطور الجديدة إلى بريغرافات وتنسيق الخط العريض
+            return text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-gold">$1</strong>').replace(/\n/g, '<br>');
         }
 
-        function closeUserManagement() {
-            document.getElementById('userManagementModal').classList.add('hidden');
-            document.getElementById('userManagementModal').classList.remove('flex');
-        }
-
-        function renderUsers() {
-            const tbody = document.getElementById('usersTableBody');
-            tbody.innerHTML = '';
-            
-            usersDB.forEach(u => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-dark transition";
-                tr.innerHTML = `
-                    <td class="px-4 py-3">${u.fullName}</td>
-                    <td class="px-4 py-3 text-gold">${u.username}</td>
-                    <td class="px-4 py-3">
-                        <input type="text" value="${u.password}" id="pass-${u.id}" class="bg-transparent border-b border-gray-700 w-20 text-center focus:border-gold outline-none" onchange="updateUserField(${u.id}, 'password', this.value)">
-                    </td>
-                    <td class="px-4 py-3">${u.role === 'admin' ? '<span class="text-xs bg-gold/20 text-gold px-2 py-1 rounded">مشرف</span>' : '<span class="text-xs bg-blue-900/40 text-blue-400 px-2 py-1 rounded">باحث</span>'}</td>
-                    <td class="px-4 py-3">
-                        <button onclick="toggleUserStatus(${u.id})" class="text-xs px-2 py-1 rounded ${u.status === 'active' ? 'bg-green-900/40 text-green-400' : 'bg-red-900/40 text-red-400'}">
-                            ${u.status === 'active' ? 'مفعل' : 'موقوف'}
-                        </button>
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                        <button onclick="deleteUser(${u.id})" class="text-red-500 hover:text-red-400 p-1" title="حذف المستخدم"><i class="fas fa-trash"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function addUser() {
-            const fName = document.getElementById('newFullName').value.trim();
-            const uName = document.getElementById('newUsername').value.trim();
-            const pass = document.getElementById('newPassword').value.trim();
-            const role = document.getElementById('newRole').value;
-
-            if(!fName || !uName || !pass) return alert("الرجاء تعبئة جميع الحقول!");
-            if(usersDB.find(u => u.username === uName)) return alert("اسم المستخدم موجود مسبقاً!");
-
-            usersDB.push({
-                id: Date.now(), fullName: fName, username: uName, password: pass, role: role, status: 'active'
-            });
-            saveDB(); renderUsers();
-            
-            document.getElementById('newFullName').value = '';
-            document.getElementById('newUsername').value = '';
-            document.getElementById('newPassword').value = '';
-        }
-
-        function updateUserField(id, field, value) {
-            const user = usersDB.find(u => u.id === id);
-            if(user) { user[field] = value; saveDB(); }
-        }
-
-        function toggleUserStatus(id) {
-            const user = usersDB.find(u => u.id === id);
-            if(user) {
-                user.status = user.status === 'active' ? 'inactive' : 'active';
-                saveDB(); renderUsers();
-            }
-        }
-
-        function deleteUser(id) {
-            if(confirm("هل أنت متأكد من حذف هذا المستخدم نهائياً؟")) {
-                usersDB = usersDB.filter(u => u.id !== id);
-                saveDB(); renderUsers();
-            }
-        }
-
-        // --- واجهة المستخدم (UI) ---
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        let isSidebarOpen = false;
-
+        // --- دوال الواجهة المساعدة ---
         function toggleSidebar() {
-            isSidebarOpen = !isSidebarOpen;
-            if(isSidebarOpen) {
-                sidebar.classList.remove('sidebar-closed');
-                overlay.classList.remove('hidden');
-            } else {
-                sidebar.classList.add('sidebar-closed');
-                overlay.classList.add('hidden');
-            }
+            const s = document.getElementById('sidebar');
+            const o = document.getElementById('sidebarOverlay');
+            s.classList.toggle('sidebar-closed');
+            o.classList.toggle('hidden');
         }
+
+        function openUserManagement() { toggleSidebar(); document.getElementById('userManagementModal').classList.remove('hidden'); }
+        function closeUserManagement() { document.getElementById('userManagementModal').classList.add('hidden'); }
     </script>
 </body>
 </html>
